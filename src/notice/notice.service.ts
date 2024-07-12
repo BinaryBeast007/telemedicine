@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { NoticeEntity } from './notice.entity';
 import { NoticeDTO } from './notice.dto';
 import { AdminEntity } from '../admin/admin.entity';
@@ -61,7 +61,21 @@ export class NoticeService {
     return this.noticeRepository.find({ where: { admin: { a_id } }, relations: ['admin'] });
   }
 
+  async showAllNotices(): Promise<NoticeEntity[]> {
+    return this.noticeRepository.find();
+  }
+
   async getNoticesByDate(date: Date): Promise<NoticeEntity[]> {
-    return this.noticeRepository.find({ where: { posted_at: date }, relations: ['admin'] });
+    const startOfDay = new Date(date);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    return this.noticeRepository.find({
+      where: {
+        posted_at: Between(startOfDay, endOfDay),
+      },
+      relations: ['admin'],
+    });
   }
 }

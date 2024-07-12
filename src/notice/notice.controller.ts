@@ -33,6 +33,11 @@ export class NoticeController {
     return this.noticeService.getNoticeById(notice_id);
   }
 
+  @Get('allnotices')
+  showAllAdmin(): object {
+    return this.noticeService.showAllNotices();
+  }
+
   @Get('getByAdminId/:a_id')
   async getNoticesByAdminId(@Param('a_id', ParseIntPipe) a_id: number): Promise<NoticeEntity[]> {
     return this.noticeService.getNoticesByAdminId(a_id);
