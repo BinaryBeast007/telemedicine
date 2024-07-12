@@ -45,8 +45,63 @@ export class AdminService {
         return this.adminRepository.findOneBy({a_id : id});
     }
 
-    async updateAdmin(id: number, updatedAdmin: AdminEntity): Promise<AdminEntity> {
-        await this.adminRepository.update(id, updatedAdmin);
-        return this.adminRepository.findOneBy({a_id:id});
+    async updateAdmin(id: number, updatedAdmin: AdminDTO): Promise<AdminEntity> {
+        const admin = await this.adminRepository.findOne({ where: { a_id: id }, relations: ['user'] });
+        if (!admin) {
+            throw new NotFoundException(`Admin with ID ${id} not found`);
+        }
+
+        // Update UserEntity properties
+        admin.user.u_name = updatedAdmin.u_name;
+        admin.user.u_email = updatedAdmin.u_email;
+        admin.user.u_password = updatedAdmin.u_password;
+        admin.user.u_role = updatedAdmin.u_role;
+        admin.user.status = updatedAdmin.status;
+
+        await this.userRepository.save(admin.user);
+
+        // Update AdminEntity properties
+        admin.a_name = updatedAdmin.a_name;
+        admin.a_address = updatedAdmin.a_address;
+        admin.a_gender = updatedAdmin.a_gender;
+        admin.a_dob = updatedAdmin.a_dob;
+        admin.a_phoneNumber = updatedAdmin.a_phone_number;
+
+        return this.adminRepository.save(admin);
+    }
+
+    async patchAdmin(id: number, partialAdmin: Partial<AdminDTO>): Promise<AdminEntity> {
+        const admin = await this.adminRepository.findOne({ where: { a_id: id }, relations: ['user'] });
+        if (!admin) {
+            throw new NotFoundException(`Admin with ID ${id} not found`);
+        }
+
+        // Update UserEntity properties if provided
+        if (partialAdmin.u_name) admin.user.u_name = partialAdmin.u_name;
+        if (partialAdmin.u_email) admin.user.u_email = partialAdmin.u_email;
+        if (partialAdmin.u_password) admin.user.u_password = partialAdmin.u_password;
+        if (partialAdmin.u_role) admin.user.u_role = partialAdmin.u_role;
+        if (partialAdmin.status) admin.user.status = partialAdmin.status;
+
+        await this.userRepository.save(admin.user);
+
+        // Update AdminEntity properties if provided
+        if (partialAdmin.a_name) admin.a_name = partialAdmin.a_name;
+        if (partialAdmin.a_address) admin.a_address = partialAdmin.a_address;
+        if (partialAdmin.a_gender) admin.a_gender = partialAdmin.a_gender;
+        if (partialAdmin.a_dob) admin.a_dob = partialAdmin.a_dob;
+        if (partialAdmin.a_phone_number) admin.a_phoneNumber = partialAdmin.a_phone_number;
+
+        return this.adminRepository.save(admin);
+    }
+
+    async deleteAdmin(id: number): Promise<void> {
+        const admin = await this.adminRepository.findOne({ where: { a_id: id }, relations: ['user'] });
+        if (!admin) {
+            throw new NotFoundException(`Admin with ID ${id} not found`);
+        }
+        
+        await this.adminRepository.remove(admin);
+        await this.userRepository.remove(admin.user);
     }
 }

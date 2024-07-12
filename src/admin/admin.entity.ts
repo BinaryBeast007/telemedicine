@@ -1,5 +1,6 @@
+import { NoticeEntity } from "src/notice/notice.entity";
 import { UserEntity } from "src/user/user.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("admin") 
 export class AdminEntity{
@@ -24,4 +25,7 @@ export class AdminEntity{
     @OneToOne(() => UserEntity, user => user.admin)
     @JoinColumn({ name: 'u_id' })
     user: UserEntity;
+
+    @OneToMany(() => NoticeEntity, notice => notice.admin)
+    notices: NoticeEntity[];
 }

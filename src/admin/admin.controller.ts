@@ -52,4 +52,19 @@ export class AdminController {
     getImage(@Param('name') filename: string, @Res() res: Response) {
         res.sendFile(filename, { root: './uploads' });
     }
+
+    @Put('update/:id')
+    async updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updatedAdmin: AdminDTO): Promise<AdminEntity> {
+        return this.adminService.updateAdmin(id, updatedAdmin);
+    }
+
+    @Patch('patch/:id')
+    async patchAdmin(@Param('id', ParseIntPipe) id: number, @Body() partialAdmin: Partial<AdminDTO>): Promise<AdminEntity> {
+        return this.adminService.patchAdmin(id, partialAdmin);
+    }
+
+    @Delete('delete/:id')
+    async deleteAdmin(@Param('id', ParseIntPipe) id: number): Promise<void> {
+        return this.adminService.deleteAdmin(id);
+    }
 }
