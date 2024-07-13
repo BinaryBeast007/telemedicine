@@ -12,7 +12,7 @@ export class AuditLogController {
     return this.auditLogService.createLog(auditLogDTO);
   }
 
-  @Get()
+  @Get('alllogs')
   async getAllLogs(): Promise<AuditLogEntity[]> {
     return this.auditLogService.getAllLogs();
   }

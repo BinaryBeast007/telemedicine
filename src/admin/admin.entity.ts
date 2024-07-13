@@ -1,4 +1,5 @@
 import { AuditLogEntity } from "src/audit-log/audit-log.entity";
+import { BlogpostEntity } from "src/blogpost/blogpost.entity";
 import { NoticeEntity } from "src/notice/notice.entity";
 import { UserEntity } from "src/user/user.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
@@ -32,4 +33,7 @@ export class AdminEntity{
 
     @OneToMany(() => AuditLogEntity, auditLog => auditLog.admin)
     auditLogs: AuditLogEntity[];
+
+    @OneToMany(() => BlogpostEntity, blogpost => blogpost.admin)
+    blogposts: BlogpostEntity[];
 }
