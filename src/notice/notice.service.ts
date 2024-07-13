@@ -4,6 +4,7 @@ import { Between, Repository } from 'typeorm';
 import { NoticeEntity } from './notice.entity';
 import { NoticeDTO } from './notice.dto';
 import { AdminEntity } from '../admin/admin.entity';
+import { AuditLogService } from 'src/audit-log/audit-log.service';
 
 @Injectable()
 export class NoticeService {
@@ -12,6 +13,7 @@ export class NoticeService {
     private readonly noticeRepository: Repository<NoticeEntity>,
     @InjectRepository(AdminEntity)
     private readonly adminRepository: Repository<AdminEntity>,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async createNotice(a_id: number, noticeDTO: NoticeDTO): Promise<NoticeEntity> {
@@ -25,6 +27,13 @@ export class NoticeService {
     notice.notice_description = noticeDTO.notice_description;
     notice.posted_by = admin.a_name; // Assuming admin name should be set as posted_by
     notice.admin = admin;
+
+    await this.auditLogService.createLog({
+      action: 'Create Notice',
+      performed_by: admin.a_name,
+      performed_at: new Date(),
+      adminId: admin.a_id,
+    });
 
     return this.noticeRepository.save(notice);
   }

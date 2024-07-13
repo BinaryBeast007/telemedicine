@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { AdminModule } from './admin/admin.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NoticeModule } from './notice/notice.module';
+import { AuditLogModule } from './audit-log/audit-log.module';
 
 @Module({
-  imports: [AdminModule, NoticeModule, TypeOrmModule.forRoot(
+  imports: [AdminModule, NoticeModule, AuditLogModule, TypeOrmModule.forRoot(
     { 
       type: 'postgres',
       host: 'localhost',

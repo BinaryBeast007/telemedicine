@@ -1,3 +1,4 @@
+import { AuditLogEntity } from "src/audit-log/audit-log.entity";
 import { NoticeEntity } from "src/notice/notice.entity";
 import { UserEntity } from "src/user/user.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
@@ -28,4 +29,7 @@ export class AdminEntity{
 
     @OneToMany(() => NoticeEntity, notice => notice.admin)
     notices: NoticeEntity[];
+
+    @OneToMany(() => AuditLogEntity, auditLog => auditLog.admin)
+    auditLogs: AuditLogEntity[];
 }
