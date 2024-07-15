@@ -27,6 +27,6 @@ export class UserEntity {
     @Column()
     status: string;
 
-    @OneToOne(() => AdminEntity, admin => admin.user)
+    @OneToOne(() => AdminEntity, admin => admin.user , { cascade: true })
     admin: AdminEntity;
 }

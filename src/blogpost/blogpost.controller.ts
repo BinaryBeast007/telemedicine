@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, Query, ParseIntPipe, UsePipes, ValidationPipe } from '@nestjs/common';
 import { BlogpostService } from './blogpost.service';
 import { BlogpostDTO } from './blogpost.dto';
 import { BlogpostEntity } from './blogpost.entity';
@@ -8,6 +8,7 @@ export class BlogpostController {
   constructor(private readonly blogpostService: BlogpostService) {}
 
   @Post('create/:adminId')
+  @UsePipes(new ValidationPipe())
   async createBlogpost(
     @Param('adminId', ParseIntPipe) adminId: number,
     @Body() blogpostDTO: BlogpostDTO

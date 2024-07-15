@@ -12,6 +12,7 @@ export class AdminController {
     constructor(private readonly adminService: AdminService) {}
 
     @Post('register')
+    @UsePipes(new ValidationPipe())
     async registerAdmin(@Body() adminDTO: AdminDTO): Promise<AdminEntity> {
         return this.adminService.registerAdmin(adminDTO);
     }

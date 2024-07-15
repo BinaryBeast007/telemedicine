@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, ParseIntPipe, Put, Delete, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Param, ParseIntPipe, Put, Delete, Get, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { NoticeDTO } from './notice.dto';
 import { NoticeEntity } from './notice.entity';
@@ -8,6 +8,7 @@ export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
   @Post('create/:a_id')
+  @UsePipes(new ValidationPipe())
   async createNotice(
     @Param('a_id', ParseIntPipe) a_id: number,
     @Body() noticeDTO: NoticeDTO,
