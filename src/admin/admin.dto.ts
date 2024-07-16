@@ -26,7 +26,7 @@ export class AdminDTO extends UserDTO {
 
     a_dob: Date;
 
-    @IsPhoneNumber(null, { message: 'Invalid phone number.' })
+    // @IsPhoneNumber(null, { message: 'Invalid phone number.' })
     @IsNotEmpty({ message: 'Phone number is required.' })
     a_phone_number: string;
 }

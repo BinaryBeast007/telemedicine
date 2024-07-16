@@ -4,6 +4,7 @@ import { Admin, Repository } from "typeorm";
 import { AdminEntity } from "./admin.entity";
 import { UserEntity } from "src/user/user.entity";
 import { AdminDTO } from "./admin.dto";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
@@ -35,6 +36,14 @@ export class AdminService {
         admin.user = savedUser;
 
         return this.adminRepository.save(admin);
+    }
+
+    private readonly saltRounds = 10;
+
+    async hashPassword(password: string): Promise<string> {
+        const salt = await bcrypt.genSalt(this.saltRounds);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        return hashedPassword;
     }
 
     async showAllAdmins(): Promise<AdminEntity[]> {

@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, Res, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { AdminDTO } from "./admin.dto";
 import { AdminEntity } from "./admin.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage, MulterError } from "multer";
 import { Response } from 'express';
+import { AuthGuard } from "src/auth/auth.guard";
 
 
 @Controller('admin')
@@ -14,10 +15,12 @@ export class AdminController {
     @Post('register')
     @UsePipes(new ValidationPipe())
     async registerAdmin(@Body() adminDTO: AdminDTO): Promise<AdminEntity> {
+        adminDTO.u_password = await this.adminService.hashPassword(adminDTO.u_password);
         return this.adminService.registerAdmin(adminDTO);
     }
 
     @Get('alladmins')
+    @UseGuards(AuthGuard)
     showAllAdmin(): object {
         return this.adminService.showAllAdmins();
     }
