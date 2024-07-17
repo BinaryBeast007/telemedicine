@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Admin, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { AdminEntity } from "./admin.entity";
 import { UserEntity } from "src/user/user.entity";
 import { AdminDTO } from "./admin.dto";
@@ -60,7 +60,6 @@ export class AdminService {
             throw new NotFoundException(`Admin with ID ${id} not found`);
         }
 
-        // Update UserEntity properties
         admin.user.u_name = updatedAdmin.u_name;
         admin.user.u_email = updatedAdmin.u_email;
         admin.user.u_password = updatedAdmin.u_password;
@@ -69,7 +68,6 @@ export class AdminService {
 
         await this.userRepository.save(admin.user);
 
-        // Update AdminEntity properties
         admin.a_name = updatedAdmin.a_name;
         admin.a_address = updatedAdmin.a_address;
         admin.a_gender = updatedAdmin.a_gender;
@@ -85,7 +83,6 @@ export class AdminService {
             throw new NotFoundException(`Admin with ID ${id} not found`);
         }
 
-        // Update UserEntity properties if provided
         if (partialAdmin.u_name) admin.user.u_name = partialAdmin.u_name;
         if (partialAdmin.u_email) admin.user.u_email = partialAdmin.u_email;
         if (partialAdmin.u_password) admin.user.u_password = partialAdmin.u_password;
@@ -94,7 +91,6 @@ export class AdminService {
 
         await this.userRepository.save(admin.user);
 
-        // Update AdminEntity properties if provided
         if (partialAdmin.a_name) admin.a_name = partialAdmin.a_name;
         if (partialAdmin.a_address) admin.a_address = partialAdmin.a_address;
         if (partialAdmin.a_gender) admin.a_gender = partialAdmin.a_gender;

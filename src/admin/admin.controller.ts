@@ -1,12 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { AdminDTO } from "./admin.dto";
 import { AdminEntity } from "./admin.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage, MulterError } from "multer";
 import { Response } from 'express';
-import { AuthGuard } from "src/auth/auth.guard";
-
+import { SessionGuard } from "src/auth/session.guard";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
 @Controller('admin')
 export class AdminController {
@@ -15,19 +15,38 @@ export class AdminController {
     @Post('register')
     @UsePipes(new ValidationPipe())
     async registerAdmin(@Body() adminDTO: AdminDTO): Promise<AdminEntity> {
-        adminDTO.u_password = await this.adminService.hashPassword(adminDTO.u_password);
-        return this.adminService.registerAdmin(adminDTO);
+        try {
+            adminDTO.u_password = await this.adminService.hashPassword(adminDTO.u_password);
+            return await this.adminService.registerAdmin(adminDTO);
+        } catch (error) {
+            throw new InternalServerErrorException('Error registering admin');
+        }
     }
 
     @Get('alladmins')
-    @UseGuards(AuthGuard)
-    showAllAdmin(): object {
-        return this.adminService.showAllAdmins();
+    @UseGuards(SessionGuard, JwtAuthGuard)
+    async showAllAdmin(): Promise<object> {
+        try {
+            return await this.adminService.showAllAdmins();
+        } catch (error) {
+            throw new InternalServerErrorException('Error fetching all admins');
+        }
     }
 
     @Get('getById/:id')
-    getAdminById(@Param('id', ParseIntPipe) id: number): object {
-        return this.adminService.getAdminById(id);
+    async getAdminById(@Param('id', ParseIntPipe) id: number): Promise<object> {
+        try {
+            const admin = await this.adminService.getAdminById(id);
+            if (!admin) {
+                throw new NotFoundException('Admin not found');
+            }
+            return admin;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error fetching admin by ID');
+        }
     }
 
     @Post('addimage')
@@ -47,28 +66,47 @@ export class AdminController {
             },
         }),
     }))
-
-    addImage(@UploadedFile() file: Express.Multer.File) {
-        return file;
+    async addImage(@UploadedFile() file: Express.Multer.File) {
+        try {
+            return file;
+        } catch (error) {
+            throw new InternalServerErrorException('Error uploading image');
+        }
     }
 
     @Get('/getimage/:name')
     getImage(@Param('name') filename: string, @Res() res: Response) {
-        res.sendFile(filename, { root: './uploads' });
+        try {
+            res.sendFile(filename, { root: './uploads' });
+        } catch (error) {
+            throw new InternalServerErrorException('Error fetching image');
+        }
     }
 
     @Put('update/:id')
     async updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updatedAdmin: AdminDTO): Promise<AdminEntity> {
-        return this.adminService.updateAdmin(id, updatedAdmin);
+        try {
+            return await this.adminService.updateAdmin(id, updatedAdmin);
+        } catch (error) {
+            throw new InternalServerErrorException('Error updating admin');
+        }
     }
 
     @Patch('patch/:id')
     async patchAdmin(@Param('id', ParseIntPipe) id: number, @Body() partialAdmin: Partial<AdminDTO>): Promise<AdminEntity> {
-        return this.adminService.patchAdmin(id, partialAdmin);
+        try {
+            return await this.adminService.patchAdmin(id, partialAdmin);
+        } catch (error) {
+            throw new InternalServerErrorException('Error patching admin');
+        }
     }
 
     @Delete('delete/:id')
     async deleteAdmin(@Param('id', ParseIntPipe) id: number): Promise<void> {
-        return this.adminService.deleteAdmin(id);
+        try {
+            return await this.adminService.deleteAdmin(id);
+        } catch (error) {
+            throw new InternalServerErrorException('Error deleting admin');
+        }
     }
 }
