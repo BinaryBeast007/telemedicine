@@ -86,6 +86,7 @@ export class AdminController {
     @Put('update/:id')
     async updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updatedAdmin: AdminDTO): Promise<AdminEntity> {
         try {
+            updatedAdmin.u_password = await this.adminService.hashPassword(updatedAdmin.u_password);
             return await this.adminService.updateAdmin(id, updatedAdmin);
         } catch (error) {
             throw new InternalServerErrorException('Error updating admin');
@@ -102,9 +103,10 @@ export class AdminController {
     }
 
     @Delete('delete/:id')
-    async deleteAdmin(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    async deleteAdmin(@Param('id', ParseIntPipe) id: number): Promise<object> {
         try {
-            return await this.adminService.deleteAdmin(id);
+            await this.adminService.deleteAdmin(id);
+            return { message: `Admin with ID ${id} successfully deleted` };
         } catch (error) {
             throw new InternalServerErrorException('Error deleting admin');
         }
