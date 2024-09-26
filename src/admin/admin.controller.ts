@@ -24,7 +24,7 @@ export class AdminController {
     }
 
     @Get('alladmins')
-    @UseGuards(SessionGuard, JwtAuthGuard)
+    // @UseGuards(SessionGuard, JwtAuthGuard)
     async showAllAdmin(): Promise<object> {
         try {
             return await this.adminService.showAllAdmins();
@@ -109,6 +109,22 @@ export class AdminController {
             return { message: `Admin with ID ${id} successfully deleted` };
         } catch (error) {
             throw new InternalServerErrorException('Error deleting admin');
+        }
+    }
+
+    @Get('getquery')
+    async getAdminByQuery(@Query('a_id', ParseIntPipe) a_id: number, @Query('a_name') a_name: string): Promise<object> {
+        try {
+            const admin = await this.adminService.getAdminByQuery(a_id, a_name);
+            if (!admin) {
+                throw new NotFoundException('Admin not found');
+            }
+            return admin;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error fetching admin by query');
         }
     }
 }

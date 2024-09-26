@@ -109,4 +109,15 @@ export class AdminService {
         await this.adminRepository.remove(admin);
         await this.userRepository.remove(admin.user);
     }
+
+    async getAdminByQuery(a_id: number, a_name: string): Promise<AdminEntity | null> {
+        return await this.adminRepository.findOne({
+            where: {
+                a_id: a_id,
+                a_name: a_name,
+            },
+            relations: ['user'],
+        });
+    }
+    
 }

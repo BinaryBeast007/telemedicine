@@ -5,6 +5,7 @@ import * as crypto from 'crypto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.use(
     session({
       secret: crypto.randomBytes(64).toString('hex'),
