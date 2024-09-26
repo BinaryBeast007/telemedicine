@@ -86,7 +86,9 @@ export class AdminController {
     @Put('update/:id')
     async updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updatedAdmin: AdminDTO): Promise<AdminEntity> {
         try {
-            updatedAdmin.u_password = await this.adminService.hashPassword(updatedAdmin.u_password);
+            if (updatedAdmin.u_password) {
+                updatedAdmin.u_password = await this.adminService.hashPassword(updatedAdmin.u_password);
+            }
             return await this.adminService.updateAdmin(id, updatedAdmin);
         } catch (error) {
             throw new InternalServerErrorException('Error updating admin');
